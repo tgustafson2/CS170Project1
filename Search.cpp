@@ -16,7 +16,7 @@
 #include <queue>
 #include <utility>
 #include <vector>
-#include "puzzle.hpp"
+//#include "puzzle.hpp"
 
 using namespace std;
 
@@ -33,41 +33,176 @@ struct node{
 };
 struct problem{
     vector<vector<int>> INITIAL_STATE;
-    priority_queue<node> (*OPERATORS)(node);
+    //priority_queue<node,vector<node>,compareCost> (*OPERATORS)(node);
     bool (*GOAL_TEST)(vector<vector<int>>);
 };
+struct compareCost{
+    bool operator()(node* a, node *b){
+        return a->cost>b->cost;
+    }
+};
 
-node general_search(problem,int * QUEUING_FUNCTION);
-node MAKE_NODE(vector<vector<int>>,node);
-priority_queue<node> EXPAND(node, int *); //need comparison struct for priority queue to do
-priority_queue<node> QUEUEING_FUNCTION(priority_queue<node>, int *);//to do
-int FIND_H(node *);//to do
-int FIND_G(node *);//to do
-//to do overload greater
+priority_queue<node*,vector<node*>,compareCost> OPERATORS(node*);
+bool GOAL_TEST(vector<vector<int>>);
+void general_search(problem);//potentially remove function pointer in parameters
+node* MAKE_NODE(vector<vector<int>>,node*);
+priority_queue<node*,vector<node*>,compareCost> EXPAND(node*); //needs fixing
+priority_queue<node*,vector<node*>,compareCost> QUEUEING_FUNCTION(priority_queue<node*,vector<node*>,compareCost>,priority_queue<node*,vector<node*>,compareCost>);//needs fixing
+int FIND_H(node* );//to do
+int FIND_G(node*);//to do
+void print(node*);
 
 int main(int argc, char** argv) {
-
+    vector<vector<int>> test;
+    //vector<int>row1={1,2,3};
+    //vector<int>row2={4,5,6};
+    //vector<int>row3={0,7,8};
+    vector<int>row1={1,2,3};
+    vector<int>row2={5,0,6};
+    vector<int>row3={4,7,8};
+    test.push_back(row1);
+    test.push_back(row2);
+    test.push_back(row3);
+    problem puzzle={test,&GOAL_TEST};
+    general_search(puzzle);
     return 0;
 }
 
-node MAKE_NODE(vector<vector<int>> givenState,node parent){
-    struct node n1={0,0,0,givenState, &parent};//set costs too
-    n1.h_n=FIND_H(n1);
-    n1.g_n=FIND_G(n1);
-    n1.cost=n1.h_n+n1.g_n;//change Function Call for each of the three search types
+bool GOAL_TEST(vector<vector<int>> test){
+    vector<vector<int>>goal;
+    vector<int>row1={1,2,3};
+    vector<int>row2={4,5,6};
+    vector<int>row3={7,8,0};
+    goal.push_back(row1);
+    goal.push_back(row2);
+    goal.push_back(row3);
+    for(int i=0;i<3;i++){
+        for(int j=0;j<3;j++){
+            if(test[i][j]!=goal[i][j])return false;
+        }
+    }
+    return true;
+}
+
+void print (node* current){
+    if (current->parent!=NULL){
+        
+        print(current->parent);
+    }
+    for(int i=0; i<3; i++){
+        for (int j=0;j<3;j++){
+            cout<<current->STATE[i][j]<<" ";
+        }
+        cout<<endl;
+    }
+    cout<<endl;
+}
+
+int FIND_H(node* a){
+    if(a->parent!=NULL)
+    return a->parent->h_n+1;
+    else return 0;
+}
+
+int FIND_G(node* a){
+    return 0;// different functions for different heuristics needed
+}
+
+priority_queue<node*,vector<node*>,compareCost> OPERATORS(node *a){
+    priority_queue<node*,vector<node*>,compareCost> nodes;
+    for (int i=0;i<3; i++){
+        for (int j=0;j<3; j++){
+            if(a->STATE[i][j]==0){
+                if(i==0){
+                    vector<vector<int>>copy=a->STATE;
+                    copy[i][j]=copy[1][j];
+                    copy[1][j]=0;
+                    nodes.push(MAKE_NODE(copy,a));
+                }
+                if(i==1){
+                    vector<vector<int>>copy=a->STATE;
+                    copy[i][j]=copy[0][j];
+                    copy[0][j]=0;
+                    nodes.push(MAKE_NODE(copy,a));
+                    copy=a->STATE;
+                    copy[i][j]=copy[2][j];
+                    copy[2][j]=0;
+                    nodes.push(MAKE_NODE(copy,a));
+                }
+                if(i==2){
+                    vector<vector<int>>copy=a->STATE;
+                    copy[i][j]=copy[1][j];
+                    copy[1][j]=0;
+                    nodes.push(MAKE_NODE(copy,a));
+                }
+                if(j==0){
+                    vector<vector<int>>copy=a->STATE;
+                    copy[i][j]=copy[i][1];
+                    copy[i][1]=0;
+                    nodes.push(MAKE_NODE(copy,a)); 
+                }
+                if(j==1){
+                    vector<vector<int>>copy=a->STATE;
+                    copy[i][j]=copy[i][0];
+                    copy[i][0]=0;
+                    nodes.push(MAKE_NODE(copy,a));
+                    copy=a->STATE;
+                    copy[i][j]=copy[i][2];
+                    copy[i][2]=0;
+                    nodes.push(MAKE_NODE(copy,a));
+                }
+                if(j==2){
+                    vector<vector<int>>copy=a->STATE;
+                    copy[i][j]=copy[i][1];
+                    copy[i][1]=0;
+                    nodes.push(MAKE_NODE(copy,a));
+                }
+                
+            }
+        }
+    }
+    return nodes;
+}
+
+node* MAKE_NODE(vector<vector<int>> givenState,node* parent){
+    struct node* n1=new node;//set costs too
+    n1->STATE=givenState;
+    n1->parent=parent;
+    n1->h_n=FIND_H(n1);
+    n1->g_n=FIND_G(n1);
+    n1->cost=n1->h_n+n1->g_n;//change Function Call for each of the three search types
     return n1;
 }
 
-node general_search(problem puzzle,priority_queue<node> * QUEUEING_FUNCTION){
-    priority_queue<node,vector<node>, greater<node>> nodes;
-    vector<node> history;
-    nodes.push(MAKE_NODE(problem.INITIAL_STATE,NULL));//nodes=MAKE_QUEUE(MAKE_NODE(problem.INITIAL_STATE,null));create priority queue, make node and set priority queue by cost
+void general_search(problem puzzle){
+    priority_queue<node*,vector<node*>, compareCost> nodes;
+    vector<node*> history;
+    nodes.push(MAKE_NODE(puzzle.INITIAL_STATE,NULL));//nodes=MAKE_QUEUE(MAKE_NODE(problem.INITIAL_STATE,null));create priority queue, make node and set priority queue by cost
+    //cout<<FIND_G(nodes.top());
     while(true){
-        if (nodes.empty())return NULL;
+        if (nodes.empty()){cout<<"Failue";return;}
+        //cout<<"in loop";
         history.push_back(nodes.top());//node=REMOVE_FRONT(nodes);// pop from priority queue
+        node * n=nodes.top();
+        //cout<<n->cost<<endl;
         nodes.pop();
-        if(problem.GOAL_TEST(node.STATE))return node;
-        nodes=QUEUEING_FUNCTION(nodes,EXPAND(node,problem.OPERATORS));// created function to call
-        //maybe store popped nodes in another stl structure
+        if(puzzle.GOAL_TEST(n->STATE)){print(n);return;}
+        nodes=QUEUEING_FUNCTION(nodes,EXPAND(n));// created function to call
+        //cout<<"End of while loop";
+        //print(nodes.top());
+        //maybe store popped nodes in another stl structure*/
     }
+}
+
+priority_queue<node*,vector<node*>,compareCost> EXPAND(node* a ){
+    priority_queue<node*,vector<node*>, compareCost> nodes=OPERATORS(a);
+    return nodes;
+}
+
+priority_queue<node*,vector<node*>,compareCost> QUEUEING_FUNCTION(priority_queue<node*,vector<node*>,compareCost> nodes,priority_queue<node*,vector<node*>,compareCost> a){
+    while(!a.empty()){
+        nodes.push(a.top());
+        a.pop();
+    }
+    return nodes;
 }
