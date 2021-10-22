@@ -105,6 +105,12 @@ int FIND_H(node* a){
 }
 
 int FIND_G(node* a){
+    int x=0;
+    for(int i=0;i<3;i++){
+        for (int j=0; j<3;j++){
+            if(a->STATE[i][j]!=(i*3)+j+1)x++;
+        }
+    }
     return 0;// different functions for different heuristics needed
 }
 
