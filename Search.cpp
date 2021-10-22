@@ -15,6 +15,7 @@
 #include <iostream>
 #include <queue>
 #include <utility>
+#include <cmath>
 #include <vector>
 //#include "puzzle.hpp"
 
@@ -57,9 +58,9 @@ int main(int argc, char** argv) {
     //vector<int>row1={1,2,3};
     //vector<int>row2={4,5,6};
     //vector<int>row3={0,7,8};
-    vector<int>row1={1,2,3};
-    vector<int>row2={5,0,6};
-    vector<int>row3={4,7,8};
+    vector<int>row1={7,1,2};
+    vector<int>row2={4,8,5};
+    vector<int>row3={6,3,0};
     test.push_back(row1);
     test.push_back(row2);
     test.push_back(row3);
@@ -105,15 +106,29 @@ int FIND_H(node* a){
 }
 
 int FIND_G(node* a){
+    vector<pair<int,int>>misplaced={{0,0},{0,1},{0,2},{1,0},{1,1},{1,2},{2,0},{2,1},{2,2}};
+    int x=0;
+    for(int i=0;i<3;i++){
+        for (int j=0; j<3;j++){
+            if(a->STATE[i][j]!=0)
+            x+=abs(misplaced[a->STATE[i][j]-1].first-i)+abs(misplaced[a->STATE[i][j]-1].second-j);
+        }
+    }
+    return x;// different functions for different heuristics needed
+}
+
+/*int FIND_G(node* a){
     int x=0;
     for(int i=0;i<3;i++){
         for (int j=0; j<3;j++){
             if(a->STATE[i][j]!=(i*3)+j+1)x++;
         }
     }
-    return 0;// different functions for different heuristics needed
-}
-
+    return x;// different functions for different heuristics needed
+}*/
+//int FIND_G(node* a){
+//    return 0;// different functions for different heuristics needed
+//}
 priority_queue<node*,vector<node*>,compareCost> OPERATORS(node *a){
     priority_queue<node*,vector<node*>,compareCost> nodes;
     for (int i=0;i<3; i++){
@@ -185,6 +200,7 @@ void general_search(problem puzzle){
     vector<node*> history;
     nodes.push(MAKE_NODE(puzzle.INITIAL_STATE,NULL));//nodes=MAKE_QUEUE(MAKE_NODE(problem.INITIAL_STATE,null));create priority queue, make node and set priority queue by cost
     //cout<<FIND_G(nodes.top());
+    //cout<<nodes.top()->cost<<endl;
     while(true){
         if (nodes.empty()){cout<<"Failue";return;}
         //cout<<"in loop";
@@ -192,7 +208,7 @@ void general_search(problem puzzle){
         node * n=nodes.top();
         //cout<<n->cost<<endl;
         nodes.pop();
-        if(puzzle.GOAL_TEST(n->STATE)){print(n);return;}
+        if(puzzle.GOAL_TEST(n->STATE)){print(n);cout<<history.size()<<" "<<nodes.size();return;}
         nodes=QUEUEING_FUNCTION(nodes,EXPAND(n));// created function to call
         //cout<<"End of while loop";
         //print(nodes.top());
