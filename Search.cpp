@@ -72,9 +72,9 @@ int main(int argc, char** argv) {
 //        vector<int>row1={1,2,3};
 //        vector<int>row2={4,5,6};//depth2
 //        vector<int>row3={0,7,8};
-//        vector<int>row1={1,2,3};
-//        vector<int>row2={5,0,6};//depth4
-//        vector<int>row3={4,7,8};
+        vector<int>row1={1,2,3};
+        vector<int>row2={5,0,6};//depth4
+        vector<int>row3={4,7,8};
 //        vector<int>row1={1,3,6};
 //        vector<int>row2={5,0,2};//depth8
 //        vector<int>row3={4,7,8};
@@ -87,9 +87,9 @@ int main(int argc, char** argv) {
 //        vector<int>row1={7,1,2};
 //        vector<int>row2={4,8,5};//depth20
 //        vector<int>row3={6,3,0};
-        vector<int>row1={0,7,2};
-        vector<int>row2={4,6,1};//depth24
-        vector<int>row3={3,5,8};
+//        vector<int>row1={0,7,2};
+//        vector<int>row2={4,6,1};//depth24
+//        vector<int>row3={3,5,8};
         test.push_back(row1);
         test.push_back(row2);
         test.push_back(row3);
@@ -145,6 +145,7 @@ void print (node* current){
         print(current->parent);
         cout<<"The next optimal state is\n";
     }
+    cout<<"Node has a g(n) ="<<current->g_n<<" and a h(n) ="<<current->h_n<<endl;
     for(int i=0; i<3; i++){
         for (int j=0;j<3;j++){
             cout<<current->STATE[i][j]<<" ";
@@ -304,8 +305,10 @@ node* MAKE_NODE(vector<vector<int>> givenState,node* parent,int solve){
 void general_search(problem puzzle,int solve){
     priority_queue<node*,vector<node*>, compareCost> nodes;//priority queue for nodes yet to be expanded and checked
     vector<node*> history;//vector to keep popped nodes
+    int x=0;
     nodes.push(MAKE_NODE(puzzle.INITIAL_STATE,NULL,solve));//nodes=MAKE_QUEUE(MAKE_NODE(problem.INITIAL_STATE,null));create priority queue, make node and set priority queue by cost
     while(true){
+        if(x<nodes.size())x=nodes.size();
         if (nodes.empty()){cout<<"Failue";return;}//if no more nodes to expand output failure and exit
         //cout<<"in loop";
         history.push_back(nodes.top());//node=REMOVE_FRONT(nodes);// pop from priority queue
@@ -313,11 +316,11 @@ void general_search(problem puzzle,int solve){
         nodes.pop();//pop top of stack off
         //check if n is the goal
         if(puzzle.GOAL_TEST(n->STATE)){
-            cout<<"Goal! The optimal path is\n";
+            cout<<"Goal! Depth is "<<n->g_n <<" The optimal path with a starting state of\n";
             //recursively print nodes on optimal path
             print(n);
             //output number of nodes expanded, subtract 1 from size of history vector as goal node was already added
-            cout<<"The number of nodes expanded was "<<history.size()-1;
+            cout<<"The number of nodes expanded was "<<history.size()-1<<"\nThe largest number of nodes in the queue was "<<x;
             return;
         }
         //Expand n and add new nodes to priority queue
