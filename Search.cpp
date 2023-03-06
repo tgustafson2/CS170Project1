@@ -66,30 +66,10 @@ int main(int argc, char** argv) {
     cout<<"Enter 1 to solve using uniform cost, 2 to solve using A* with misplaced tile heuristic, and 3 to solve using A* with Manhattan Distance Heuristic"<<endl;
     cin>>solve;
     if(decision==1){
-//        vector<int>row1={1,2,3};
-//        vector<int>row2={4,5,6};//depth0
-//        vector<int>row3={7,8,0};
-//        vector<int>row1={1,2,3};
-//        vector<int>row2={4,5,6};//depth2
-//        vector<int>row3={0,7,8};
+
         vector<int>row1={1,2,3};
         vector<int>row2={5,0,6};//depth4
         vector<int>row3={4,7,8};
-//        vector<int>row1={1,3,6};
-//        vector<int>row2={5,0,2};//depth8
-//        vector<int>row3={4,7,8};
-//        vector<int>row1={1,3,6};
-//        vector<int>row2={5,0,7};//depth12
-//        vector<int>row3={4,8,2};
-//        vector<int>row1={1,6,7};
-//        vector<int>row2={5,0,3};//depth16
-//        vector<int>row3={4,8,2};
-//        vector<int>row1={7,1,2};
-//        vector<int>row2={4,8,5};//depth20
-//        vector<int>row3={6,3,0};
-//        vector<int>row1={0,7,2};
-//        vector<int>row2={4,6,1};//depth24
-//        vector<int>row3={3,5,8};
         test.push_back(row1);
         test.push_back(row2);
         test.push_back(row3);
